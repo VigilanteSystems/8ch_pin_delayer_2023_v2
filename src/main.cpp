@@ -2,57 +2,41 @@
 // 8 channel pin signal(HIGH) delay(er)
 // - by Philipp Rauch - VigilanteSystems - opensource - 23.03.2023
 // ***************************************************************************
-// its to delay signals from 8 channel parallel port signals to relays
-// to avoid toggling relays at system reboot/bootup etc ... bootup toggle...
-// ***************************************************************************
+// It delays signals from 8 channel parallel port signals to relays
+// to avoid toggling relays at system reboot/bootup etc.
 
-// 8CH_PIN_DELAYER_2023_v2
+// 8CH_PIN_DELAYER_2023_v4
 
-// **** INCLUDES *****
 #include <Arduino.h>
+#include <LowPower.h>
+#include <digitalWriteFast.h>
 
-// pins for arduino mini pro 5V 16MHz
-// [left side (digital) out, right side (half analog) in]
-const byte inPins[8] = {10, 11, 12, 13, A0, A1, A2, A3};
-const byte outPins[8] = {9, 8, 7, 6, 5, 4, 3, 2};
-bool runOnce = true; // or what?
+// Pins for Arduino Mini Pro 5V 16MHz
+const byte inPins[] = {10, 11, 12, 13, A0, A1, A2, A3};
+const byte outPins[] = {9, 8, 7, 6, 5, 4, 3, 2};
 
 void setup()
 {
-  // // forDEBUG
-  // Serial.begin(115200);
-
-  // while (!Serial)
-  // {
-  // } // wait for serial port to connect. Needed for native USB port only
-
-// set in/out pins (insgesamt 8 mal)
-  for (int index = 0; index <= 7; index++) 
+  // Set input/output pins
+  for (int i = 0; i < 8; i++) 
   {
-    // set input/output pins
-    pinMode(inPins[index], INPUT);
-    pinMode(outPins[index], OUTPUT);
-    // set all low, also this turns off PWM on the analog ports
-    digitalWrite(inPins[index], LOW);
-    digitalWrite(outPins[index], LOW);
-    // Serial.println("*****"); // 10000000
+    pinMode(inPins[i], INPUT);
+    pinMode(outPins[i], OUTPUT);
+    digitalWrite(outPins[i], LOW);
   }
+
+  // Wait for 4 seconds before starting to read input pins
+  delay(4000);
 }
 
 void loop()
 {
-  if (runOnce)
+  // Read input pins and set corresponding output pins
+  for (int i = 0; i < 8; i++)
   {
-    delay(4000);
-    runOnce = false;
+    digitalWrite(outPins[i], digitalReadFast(inPins[i]));
   }
-  // Prüfe den Wert vom Zähler (insgesamt 8 mal)
-  // we write first then read, to avoid, bootup togglesituation
-  for (int index = 0; index <= 7; index++) // set in/out pins (insgesamt 8 mal)
-  {
-    if (digitalRead(inPins[index]) == LOW)
-      digitalWrite(outPins[index], LOW);
-    if (digitalRead(inPins[index]) == HIGH)
-      digitalWrite(outPins[index], HIGH);
-  }
+
+  // Put the Arduino into low-power standby mode for 1 second
+  LowPower.powerStandby(SLEEP_2S, ADC_OFF, BOD_OFF);
 }
