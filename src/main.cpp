@@ -9,34 +9,41 @@
 
 #include <Arduino.h>
 #include <LowPower.h>
-#include <digitalWriteFast.h>
+// #include <digitalWriteFast.h>
 
 // Pins for Arduino Mini Pro 5V 16MHz
 const byte inPins[] = {10, 11, 12, 13, A0, A1, A2, A3};
 const byte outPins[] = {9, 8, 7, 6, 5, 4, 3, 2};
+unsigned long startMillis = millis();
 
 void setup()
 {
   // Set input/output pins
-  for (int i = 0; i < 8; i++) 
+  for (int i = 0; i < 8; i++)
   {
     pinMode(inPins[i], INPUT);
     pinMode(outPins[i], OUTPUT);
     digitalWrite(outPins[i], LOW);
   }
-
-  // Wait for 4 seconds before starting to read input pins
-  delay(4000);
+  startMillis = millis();
+  while (millis() - startMillis < 4000)
+  {
+    // do nothing, just wait 4000 ms
+  }
 }
 
 void loop()
 {
+  // Put the Arduino into low-power standby mode for 4 second
+  LowPower.powerStandby(SLEEP_4S, ADC_OFF, BOD_OFF);
+  startMillis = millis();
+  while (millis() - startMillis < 500)
+  {
+    // do nothing, just wait  500 ms to wake up
+  }
   // Read input pins and set corresponding output pins
   for (int i = 0; i < 8; i++)
   {
-    digitalWrite(outPins[i], digitalReadFast(inPins[i]));
+    digitalWrite(outPins[i], digitalRead(inPins[i]));
   }
-
-  // Put the Arduino into low-power standby mode for 1 second
-  LowPower.powerStandby(SLEEP_2S, ADC_OFF, BOD_OFF);
 }
