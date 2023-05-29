@@ -9,11 +9,10 @@
 
 #include <Arduino.h>
 #include <LowPower.h>
-// #include <digitalWriteFast.h>
 
 // Pins for Arduino Mini Pro 5V 16MHz
 const byte inPins[] = {10, 11, 12, 13, A0, A1, A2, A3};
-const byte outPins[] = {9, 8, 7, 6, 5, 4, 3, 2};
+const byte outPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
 unsigned long startMillis = millis();
 
 void setup()
