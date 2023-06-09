@@ -1,0 +1,16 @@
+[Unit]
+Description=Switch Parallel Port 2 - Printer Power- Relay ON/OFF/CYCLE
+After=octoprint.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/home/octoprinter/parallel/
+ExecStart=/home/octoprinter/parallel/parPinSet.py 2 HIGH
+ExecStop=/home/octoprinter/parallel/parPinSet.py 2 LOW
+ExecReload=/home/octoprinter/parallel/printerPowerCycle.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
